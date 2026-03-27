@@ -12,6 +12,7 @@ depends=('python' 'python-requests' 'python-apscheduler' 'python-sqlalchemy'
 makedepends=('git')
 provides=('mwu-bot')
 conflicts=('mwu-bot')
+install=mwu-bot.install
 
 source=("git+${url}.git")
 sha256sums=('SKIP')

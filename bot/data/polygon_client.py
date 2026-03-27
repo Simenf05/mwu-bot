@@ -44,3 +44,24 @@ class PolygonClient:
         prev_close = float(results[1]["c"])
         return close, prev_close
 
+    def get_recent_daily_closes(self, symbol: str, session_date: date, *, lookback_days: int) -> list[float]:
+        """
+        Returns a list of closes (most-recent first) for up to `lookback_days` trading days
+        ending at `session_date`.
+        """
+        if lookback_days <= 1:
+            raise ValueError("lookback_days must be > 1")
+        sym = symbol.upper()
+        d_to = session_date.isoformat()
+        d_from = (session_date - timedelta(days=max(14, lookback_days * 3))).isoformat()
+
+        data = self._get_json(
+            f"/v2/aggs/ticker/{sym}/range/1/day/{d_from}/{d_to}",
+            params={"adjusted": "true", "sort": "desc", "limit": str(min(50000, lookback_days + 25))},
+        )
+        results = data.get("results") or []
+        closes = [float(r["c"]) for r in results]
+        if len(closes) < 2:
+            raise RuntimeError(f"Polygon did not return enough daily bars for {sym} up to {d_to}")
+        return closes[:lookback_days]
+

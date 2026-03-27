@@ -37,6 +37,29 @@ Common optional:
 - `BOT_SQLITE_PATH=bot_state.sqlite`
 - `BOT_TIMEZONE=America/New_York`
 - `BOT_EXCHANGE_CALENDAR=XNYS`
+- `BOT_DRY_RUN=true` (compute + log orders, but do not submit to Alpaca)
+
+### Automatic add/drop symbol universe (optional)
+
+If set, the bot will pick a daily active universe from a larger pool, enforcing basic diversification constraints.
+
+Minimal setup (sane defaults built-in):
+- Set only `BOT_UNIVERSE_SIZE=8` (or any K). The bot will use an internal diversified pool (stocks+ETFs) with category tags and safe-category defaults.
+
+Core settings:
+- `BOT_CANDIDATE_POOL=SPY,QQQ,TLT,IEF,GLD,JNJ,PG,WMT,XLU,VNQ` (the pool it can choose from)
+- `BOT_SYMBOL_TAGS=SPY=equity_us,QQQ=equity_us,TLT=bonds_long,IEF=bonds_int,GLD=gold,JNJ=healthcare,PG=consumer_staples,WMT=consumer_staples,XLU=utilities,VNQ=real_estate`
+- `BOT_UNIVERSE_SIZE=10` (K)
+- `BOT_SAFE_CATEGORIES=bonds_long,bonds_int,gold` (categories considered “safe”)
+- `BOT_UNIVERSE_SAFE_MIN=2` (minimum “safe” symbols in the selected K)
+- `BOT_UNIVERSE_MAX_PER_CATEGORY=2` (cap per category)
+
+Scoring:
+- `BOT_SCORE_LOOKBACK_DAYS=90`
+- `BOT_SCORE_METRIC=momentum_return` (or `risk_adjusted`)
+
+Holdings outside the selected universe:
+- `BOT_OUT_OF_UNIVERSE_POSITIONS=ignore` (default; keep them, but size/rebalance only within the active universe + cash)\n+  - other options: `warn_and_skip` (place no trades) or `liquidate` (sell them)
 
 You can also create a local `.env` file and the scheduler will load it (via `python-dotenv`).
 
@@ -85,5 +108,18 @@ Check logs with:
 sudo journalctl -u mwu-bot.service -f
 ```
 
-For Arch packaging, see `packaging/PKGBUILD.mwu-bot-git` as a starting point for an AUR package.
+- **Uninstall on any systemd distro (root):**
+
+```bash
+cd /path/to/this/repo
+sudo bash packaging/uninstall.sh
+```
+
+This will:
+- Stop and disable the `mwu-bot.service` unit
+- Remove the systemd unit file
+- Remove `/opt/mwu-bot`
+- Attempt to remove the dedicated `mwu` user if it is not used for anything else
+
+For Arch packaging, install and uninstall are handled by `pacman` via the AUR package (e.g. `mwu-bot-git`). See `packaging/PKGBUILD.mwu-bot-git` as a starting point for an AUR package.
 
