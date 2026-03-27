@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import logging
-from datetime import date
+from datetime import date, datetime
 
+import exchange_calendars as ecals
 import numpy as np
+from dotenv import load_dotenv
 
 from bot.broker.alpaca_client import AlpacaBroker
-from bot.config import BotConfig
+from bot.config import BotConfig, load_config_from_env
 from bot.data.polygon_client import PolygonClient
 from bot.rebalance.bands import (
     BandRebalanceParams,
@@ -235,4 +237,29 @@ def run_one_session(cfg: BotConfig, session_date: date) -> None:
         log.exception("Run failed for %s", session_date)
         store.finish_run(run_id, status="failed", error=str(e))
         raise
+
+
+def _session_date_now(calendar_name: str, tz: str) -> date:
+    cal = ecals.get_calendar(calendar_name)
+    now = datetime.now(tz=cal.tz)  # calendar tz is typically America/New_York
+    # If market is open today, use today's session date; otherwise last session.
+    if cal.is_session(now.date()):
+        return now.date()
+    return cal.previous_session(now.date()).date()
+
+
+def main() -> None:
+    load_dotenv()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+
+    cfg = load_config_from_env()
+    session_date = _session_date_now(cfg.exchange_calendar, cfg.timezone)
+
+    log.info("Starting one-off session for %s", session_date)
+    run_one_session(cfg, session_date=session_date)
+    log.info("One-off session complete for %s", session_date)
+
+
+if __name__ == "__main__":
+    main()
 

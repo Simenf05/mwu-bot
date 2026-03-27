@@ -9,16 +9,7 @@ from apscheduler.triggers.cron import CronTrigger
 from dotenv import load_dotenv
 
 from bot.config import load_config_from_env
-from bot.run_daily import run_one_session
-
-
-def _session_date_now(calendar_name: str, tz: str) -> datetime.date:
-    cal = ecals.get_calendar(calendar_name)
-    now = datetime.now(tz=cal.tz)  # calendar tz is typically America/New_York
-    # If market is open today, use today's session date; otherwise last session.
-    if cal.is_session(now.date()):
-        return now.date()
-    return cal.previous_session(now.date()).date()
+from bot.run_daily import _session_date_now, run_one_session
 
 
 def main() -> None:
