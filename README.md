@@ -85,5 +85,5 @@ Check logs with:
 sudo journalctl -u mwu-bot.service -f
 ```
 
-For Arch packaging, see `packaging/PKGBUILD.mwu-bot-git.example` as a starting point for an AUR package.
+For Arch packaging, see `packaging/PKGBUILD.mwu-bot-git` as a starting point for an AUR package.
 

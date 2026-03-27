@@ -3,7 +3,7 @@ pkgver=0.1.0
 pkgrel=1
 pkgdesc="Multiplicative Weights Update trading bot (Polygon + Alpaca)"
 arch=('any')
-url="https://example.com/your-repo-url"  # replace with your real URL
+url="https://github.com/Simenf05/mwu-bot"
 license=('custom')
 depends=('python' 'python-requests' 'python-apscheduler' 'python-sqlalchemy'
          'python-tenacity' 'python-python-dotenv' 'python-pandas'
