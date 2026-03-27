@@ -1,19 +1,35 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, timedelta
+import time
 
 import requests
-from tenacity import retry, stop_after_attempt, wait_exponential
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 
-@dataclass(frozen=True)
+@dataclass
 class PolygonClient:
     api_key: str
     base_url: str = "https://api.polygon.io"
+    last_five_reqs: list[float] = field(default_factory=list)  # mutable default safely
 
-    @retry(stop=stop_after_attempt(5), wait=wait_exponential(multiplier=0.5, min=1, max=10))
+    @retry(
+        stop=stop_after_attempt(10),
+        wait=wait_exponential(multiplier=2, min=12, max=60),
+        retry=retry_if_exception_type(requests.exceptions.HTTPError),
+    )
     def _get_json(self, path: str, params: dict[str, str]) -> dict:
+        # --- Enforce 5 requests per minute ---
+        if len(self.last_five_reqs) >= 5:
+            elapsed = time.time() - self.last_five_reqs[0]
+            if elapsed < 60:
+                time.sleep(60 - elapsed)
+            self.last_five_reqs.pop(0)
+
+        self.last_five_reqs.append(time.time())
+
+        # Make the request
         p = dict(params)
         p["apiKey"] = self.api_key
         url = f"{self.base_url}{path}"
@@ -40,9 +56,7 @@ class PolygonClient:
         results = data.get("results") or []
         if len(results) < 2:
             raise RuntimeError(f"Polygon did not return 2 daily bars for {sym} up to {d_to}")
-        close = float(results[0]["c"])
-        prev_close = float(results[1]["c"])
-        return close, prev_close
+        return float(results[0]["c"]), float(results[1]["c"])
 
     def get_recent_daily_closes(self, symbol: str, session_date: date, *, lookback_days: int) -> list[float]:
         """

@@ -114,6 +114,7 @@ class BotConfig:
     score_lookback_days: int = 90
     score_metric: str = "momentum_return"  # momentum_return|risk_adjusted
     out_of_universe_positions: str = "ignore"  # ignore|warn_and_skip|liquidate
+    polygon_free_tier: bool = True
 
 
 def load_config_from_env() -> BotConfig:
@@ -164,6 +165,8 @@ def load_config_from_env() -> BotConfig:
 
     out_of_universe_positions = os.getenv("BOT_OUT_OF_UNIVERSE_POSITIONS", "ignore").strip()
 
+    polygon_free_tier = os.getenv("POLYGON_FREE_TIER", "true").lower() in {"1", "true", "yes", "y"}
+
     # Sane defaults: setting only BOT_UNIVERSE_SIZE enables auto-selection
     # using a built-in diversified pool + categories.
     if universe_size is not None:
@@ -198,5 +201,6 @@ def load_config_from_env() -> BotConfig:
         score_lookback_days=score_lookback_days,
         score_metric=score_metric,
         out_of_universe_positions=out_of_universe_positions,
+        polygon_free_tier=polygon_free_tier,
     )
 
