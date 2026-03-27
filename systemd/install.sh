@@ -4,8 +4,10 @@ set -euo pipefail
 # Simple cross-distro installer for systemd-based systems.
 # Installs the bot into /opt/mwu-bot and sets up a service.
 
-DB_PATH=/var/lib/mwu-bot/state.db
-ENV_PATH=/etc/mwu-bot/.env
+# Comment: Might not work, I use arch, btw
+
+DB_PATH=/var/lib/mwu-bot.db
+ENV_PATH=/etc/mwu-bot.env
 APP_DIR=/opt/mwu-bot
 SERVICE_NAME=mwu-bot.service
 SERVICE_SRC=systemd/mwu-bot-venv.service
