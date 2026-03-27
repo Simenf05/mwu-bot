@@ -69,13 +69,6 @@ if [[ ! -f "$ENV_PATH" ]]; then
   echo "[*] Created skeleton $ENV_PATH – edit it with your API keys."
 fi
 
-if [[ ! -f "$DB_PATH" ]]; then
-  mkdir -p "$(dirname "$DB_PATH")"
-  touch "$DB_PATH"
-  chown "$USER_NAME":"$GROUP_NAME" "$DB_PATH"
-  echo "[*] Created skeleton $DB_PATH."
-fi
-
 echo "[*] Installing systemd unit..."
 cp "$SERVICE_SRC" "/etc/systemd/system/$SERVICE_NAME"
 systemctl daemon-reload
