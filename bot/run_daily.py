@@ -5,7 +5,6 @@ from datetime import date, datetime
 
 import exchange_calendars as ecals
 import numpy as np
-from dotenv import load_dotenv
 
 from bot.broker.alpaca_client import AlpacaBroker
 from bot.config import BotConfig, load_config_from_env

@@ -6,7 +6,6 @@ from datetime import datetime
 import exchange_calendars as ecals
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
-from dotenv import load_dotenv
 
 from bot.config import load_config_from_env
 from bot.run_daily import _session_date_now, run_one_session
