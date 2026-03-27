@@ -103,7 +103,7 @@ class BotConfig:
     dry_run: bool = False
 
     strategy_version: str = "mwu_v1"
-    sqlite_path: str = "bot_state.sqlite"
+    sqlite_path: str = "/var/lib/mwu-bot/state.db"
 
     candidate_pool: list[str] | None = None
     symbol_tags: dict[str, str] | None = None
