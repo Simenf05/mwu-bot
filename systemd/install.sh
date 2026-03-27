@@ -6,7 +6,7 @@ set -euo pipefail
 
 APP_DIR=/opt/mwu-bot
 SERVICE_NAME=mwu-bot.service
-SERVICE_SRC=packaging/mwu-bot.service
+SERVICE_SRC=packaging/mwu-bot-venv.service
 PYTHON_BIN=${PYTHON_BIN:-python3}
 USER_NAME=${USER_NAME:-mwu}
 GROUP_NAME=${GROUP_NAME:-$USER_NAME}
@@ -22,6 +22,11 @@ run_as_user() {
 
   if command -v runuser >/dev/null 2>&1; then
     runuser -u "$user" -- "$@"
+    return $?
+  fi
+
+  if command -v doas >/dev/null 2>&1; then
+    doas -u "$user" -- "$@"
     return $?
   fi
 
