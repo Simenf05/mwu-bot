@@ -11,7 +11,7 @@ Restart=on-failure
 RestartSec=10
 User=mwu
 Group=mwu
-UMask=007
+UMask=0077
 
 [Install]
 WantedBy=multi-user.target

@@ -104,7 +104,7 @@ class BotConfig:
     dry_run: bool = False
 
     strategy_version: str = "mwu_v1"
-    sqlite_path: str = "/var/lib/mwu-bot.db"
+    sqlite_path: str | None = None
     env_path: str = "/etc/mwu-bot.env"
 
     candidate_pool: list[str] | None = None
@@ -144,7 +144,7 @@ def load_config_from_env() -> BotConfig:
 
     dry_run = os.getenv("BOT_DRY_RUN", "false").lower() in {"1", "true", "yes", "y"}
 
-    sqlite_path = os.getenv("BOT_SQLITE_PATH", "/var/lib/mwu-bot.db")
+    sqlite_path = os.getenv("BOT_SQLITE_PATH", "/var/lib/mwu-bot/state.db")
 
     candidate_pool_raw = os.getenv("BOT_CANDIDATE_POOL")
     candidate_pool = _parse_csv_syms(candidate_pool_raw) if candidate_pool_raw else None

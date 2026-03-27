@@ -6,7 +6,7 @@ set -euo pipefail
 
 # Comment: Might not work, I use arch, btw
 
-DB_PATH=/var/lib/mwu-bot.db
+DB_PATH=/var/lib/mwu-bot/state.db
 ENV_PATH=/etc/mwu-bot.env
 APP_DIR=/opt/mwu-bot
 SERVICE_NAME=mwu-bot.service
