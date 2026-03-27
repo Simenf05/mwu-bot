@@ -9,7 +9,8 @@ WorkingDirectory=/opt/mwu-bot
 ExecStart=/usr/bin/python -m bot.scheduler
 Restart=on-failure
 RestartSec=10
-DynamicUser=yes
+User=mwu
+Group=mwu
 
 [Install]
 WantedBy=multi-user.target
