@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ENV_PATH=/etc/mwu-bot/.env
+DB_PATH=/var/lib/mwu-bot/state.db
 APP_DIR=/opt/mwu-bot
 SERVICE_NAME=mwu-bot.service
 SERVICE_PATH=/etc/systemd/system/$SERVICE_NAME

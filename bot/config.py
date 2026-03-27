@@ -104,6 +104,7 @@ class BotConfig:
 
     strategy_version: str = "mwu_v1"
     sqlite_path: str = "/var/lib/mwu-bot/state.db"
+    env_path: str = "/etc/mwu-bot/.env"
 
     candidate_pool: list[str] | None = None
     symbol_tags: dict[str, str] | None = None
@@ -114,10 +115,11 @@ class BotConfig:
     score_lookback_days: int = 90
     score_metric: str = "momentum_return"  # momentum_return|risk_adjusted
     out_of_universe_positions: str = "ignore"  # ignore|warn_and_skip|liquidate
-    polygon_free_tier: bool = True
 
 
 def load_config_from_env() -> BotConfig:
+    load_dotenv(BotConfig.env_path)
+
     symbols = os.getenv("BOT_SYMBOLS", "SPY,QQQ,TLT,IEF,GLD,JNJ,PG,WMT,XLU,VNQ")
     symbol_list = _parse_csv_syms(symbols)
     if not symbol_list:
@@ -165,8 +167,6 @@ def load_config_from_env() -> BotConfig:
 
     out_of_universe_positions = os.getenv("BOT_OUT_OF_UNIVERSE_POSITIONS", "ignore").strip()
 
-    polygon_free_tier = os.getenv("POLYGON_FREE_TIER", "true").lower() in {"1", "true", "yes", "y"}
-
     # Sane defaults: setting only BOT_UNIVERSE_SIZE enables auto-selection
     # using a built-in diversified pool + categories.
     if universe_size is not None:
@@ -201,6 +201,5 @@ def load_config_from_env() -> BotConfig:
         score_lookback_days=score_lookback_days,
         score_metric=score_metric,
         out_of_universe_positions=out_of_universe_positions,
-        polygon_free_tier=polygon_free_tier,
     )
 

@@ -4,9 +4,11 @@ set -euo pipefail
 # Simple cross-distro installer for systemd-based systems.
 # Installs the bot into /opt/mwu-bot and sets up a service.
 
+DB_PATH=/var/lib/mwu-bot/state.db
+ENV_PATH=/etc/mwu-bot/.env
 APP_DIR=/opt/mwu-bot
 SERVICE_NAME=mwu-bot.service
-SERVICE_SRC=packaging/mwu-bot-venv.service
+SERVICE_SRC=systemd/mwu-bot-venv.service
 PYTHON_BIN=${PYTHON_BIN:-python3}
 USER_NAME=${USER_NAME:-mwu}
 GROUP_NAME=${GROUP_NAME:-$USER_NAME}
@@ -49,9 +51,7 @@ mkdir -p "$APP_DIR"
 chown -R "$USER_NAME":"$GROUP_NAME" "$APP_DIR"
 
 echo "[*] Copying project files into $APP_DIR..."
-rsync -a --delete \
-  bot scripts main.py implementation_plan.md requirements.txt README.md \
-  "$APP_DIR"/
+cp -r . "$APP_DIR"/
 
 echo "[*] Creating virtualenv and installing dependencies..."
 cd "$APP_DIR"
@@ -59,17 +59,19 @@ run_as_user "$USER_NAME" "$PYTHON_BIN" -m venv .venv
 run_as_user "$USER_NAME" .venv/bin/pip install --upgrade pip
 run_as_user "$USER_NAME" .venv/bin/pip install -r requirements.txt
 
-if [[ ! -f "$APP_DIR/.env" ]]; then
-  cat > "$APP_DIR/.env" << 'EOF'
-# Fill in your real keys/secrets:
-POLYGON_API_KEY=CHANGE_ME
-ALPACA_KEY_ID=CHANGE_ME
-ALPACA_SECRET_KEY=CHANGE_ME
-ALPACA_PAPER=true
-EOF
-  chown "$USER_NAME":"$GROUP_NAME" "$APP_DIR/.env"
-  chmod 600 "$APP_DIR/.env"
-  echo "[*] Created skeleton $APP_DIR/.env – edit it with your API keys."
+if [[ ! -f "$ENV_PATH" ]]; then
+  mkdir -p "$(dirname "$ENV_PATH")"
+  cp "$APP_DIR"/.env.example "$ENV_PATH"
+  chown "$USER_NAME":"$GROUP_NAME" "$ENV_PATH"
+  chmod 600 "$ENV_PATH"
+  echo "[*] Created skeleton $ENV_PATH – edit it with your API keys."
+fi
+
+if [[ ! -f "$DB_PATH" ]]; then
+  mkdir -p "$(dirname "$DB_PATH")"
+  touch "$DB_PATH"
+  chown "$USER_NAME":"$GROUP_NAME" "$DB_PATH"
+  echo "[*] Created skeleton $DB_PATH."
 fi
 
 echo "[*] Installing systemd unit..."

@@ -249,7 +249,6 @@ def _session_date_now(calendar_name: str, tz: str) -> date:
 
 
 def main() -> None:
-    load_dotenv()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
     cfg = load_config_from_env()

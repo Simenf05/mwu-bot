@@ -13,7 +13,6 @@ from bot.run_daily import _session_date_now, run_one_session
 
 
 def main() -> None:
-    load_dotenv()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
     cfg = load_config_from_env()
